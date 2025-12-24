@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class RedisMap<K, V> implements Map<K, V> {
+    private static final String KEY_IS_NULL_STRING = "Key is null";
 
     private final JedisPool pool;
     private final String redisKey;
@@ -64,7 +65,7 @@ public class RedisMap<K, V> implements Map<K, V> {
 
     @Override
     public boolean containsKey(Object key) {
-        Objects.requireNonNull(key, "Key is null");
+        Objects.requireNonNull(key, KEY_IS_NULL_STRING);
 
         try (Jedis jedis = pool.getResource()) {
             return jedis.hexists(redisKey, serialize(key));
@@ -100,7 +101,7 @@ public class RedisMap<K, V> implements Map<K, V> {
 
     @Override
     public V get(Object key) {
-        Objects.requireNonNull(key, "Key is null");
+        Objects.requireNonNull(key, KEY_IS_NULL_STRING);
 
         try (Jedis jedis = pool.getResource()) {
             String json = jedis.hget(redisKey, serialize(key));
@@ -110,7 +111,7 @@ public class RedisMap<K, V> implements Map<K, V> {
 
     @Override
     public V put(K key, V value) {
-        Objects.requireNonNull(key, "Key is null");
+        Objects.requireNonNull(key, KEY_IS_NULL_STRING);
         Objects.requireNonNull(value, "Value is null");
 
         V old = get(key);
@@ -122,7 +123,7 @@ public class RedisMap<K, V> implements Map<K, V> {
 
     @Override
     public V remove(Object key) {
-        Objects.requireNonNull(key, "Key is null");
+        Objects.requireNonNull(key, KEY_IS_NULL_STRING);
 
         V old = get(key);
         try (Jedis jedis = pool.getResource()) {
@@ -170,7 +171,7 @@ public class RedisMap<K, V> implements Map<K, V> {
             return jedis.hvals(redisKey)
                     .stream()
                     .map(v -> deserialize(v, valueClass))
-                    .collect(Collectors.toList());
+                    .toList();
         }
     }
 
